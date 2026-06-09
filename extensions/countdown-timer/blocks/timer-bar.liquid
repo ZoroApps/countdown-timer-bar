@@ -1,0 +1,284 @@
+{% liquid
+  assign timer_id = 'countdown-timer-' | append: block.id
+  assign position_class = 'countdown-timer--' | append: block.settings.position
+%}
+
+<div
+  id="{{ timer_id }}"
+  class="countdown-timer {{ position_class }}"
+  role="region"
+  aria-label="Sales countdown timer"
+  {{ block.shopify_attributes }}
+>
+  <div class="countdown-timer__layout">
+    <p class="countdown-timer__message" data-timer-message>{{ block.settings.promo_text }}</p>
+
+    <div class="countdown-timer__clock" data-timer-clock role="timer" aria-label="Time remaining">
+      <span class="countdown-timer__digit"><strong data-hours>00</strong><small>Hours</small></span>
+      <span class="countdown-timer__separator" aria-hidden="true">:</span>
+      <span class="countdown-timer__digit"><strong data-minutes>00</strong><small>Minutes</small></span>
+      <span class="countdown-timer__separator" aria-hidden="true">:</span>
+      <span class="countdown-timer__digit"><strong data-seconds>00</strong><small>Seconds</small></span>
+    </div>
+
+    {% if block.settings.button_text != blank %}
+      <a
+        class="countdown-timer__button"
+        data-timer-button
+        href="{{ block.settings.button_link | default: routes.all_products_collection_url }}"
+      >
+        {{ block.settings.button_text }}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  #{{ timer_id }} {
+    --p-color-bg-surface: {{ block.settings.background_color }};
+    --p-color-text: {{ block.settings.text_color }};
+    --p-color-bg-fill-brand: {{ block.settings.accent_color }};
+    --p-color-text-on-color: #ffffff;
+    --p-color-border: rgba(0, 0, 0, 0.16);
+    --p-shadow-300: 0 4px 12px rgba(0, 0, 0, 0.16);
+    --p-border-radius-200: 8px;
+    --p-space-100: 4px;
+    --p-space-200: 8px;
+    --p-space-300: 12px;
+    --p-space-400: 16px;
+    --p-space-500: 20px;
+
+    position: fixed;
+    right: 0;
+    left: 0;
+    z-index: 2147483647;
+    box-sizing: border-box;
+    width: 100%;
+    padding: var(--p-space-300) var(--p-space-500);
+    color: var(--p-color-text);
+    background: var(--p-color-bg-surface);
+    box-shadow: var(--p-shadow-300);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    transition: opacity 240ms ease, visibility 240ms ease, transform 240ms ease;
+  }
+
+  #{{ timer_id }} *,
+  #{{ timer_id }} *::before,
+  #{{ timer_id }} *::after {
+    box-sizing: border-box;
+  }
+
+  #{{ timer_id }}.countdown-timer--top { top: 0; }
+  #{{ timer_id }}.countdown-timer--bottom { bottom: 0; }
+
+  #{{ timer_id }}.countdown-timer--hidden {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY({% if block.settings.position == 'top' %}-100%{% else %}100%{% endif %});
+    pointer-events: none;
+  }
+
+  #{{ timer_id }} .countdown-timer__layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--p-space-500);
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  #{{ timer_id }} .countdown-timer__message {
+    margin: 0;
+    font-size: clamp(0.92rem, 1.3vw, 1.08rem);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  #{{ timer_id }} .countdown-timer__clock {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--p-space-100);
+  }
+
+  #{{ timer_id }} .countdown-timer__digit {
+    display: grid;
+    min-width: 58px;
+    min-height: 54px;
+    place-content: center;
+    padding: var(--p-space-100) var(--p-space-200);
+    color: var(--p-color-text-on-color);
+    background: var(--p-color-bg-fill-brand);
+    border: 1px solid var(--p-color-border);
+    border-radius: var(--p-border-radius-200);
+    text-align: center;
+  }
+
+  #{{ timer_id }} .countdown-timer__digit strong {
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  #{{ timer_id }} .countdown-timer__digit small {
+    margin-top: var(--p-space-100);
+    font-size: 0.56rem;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  #{{ timer_id }} .countdown-timer__separator {
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+
+  #{{ timer_id }} .countdown-timer__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: var(--p-space-200) var(--p-space-400);
+    color: var(--p-color-text-on-color);
+    background: var(--p-color-bg-fill-brand);
+    border: 1px solid var(--p-color-border);
+    border-radius: var(--p-border-radius-200);
+    font-size: 0.9rem;
+    font-weight: 650;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  #{{ timer_id }} .countdown-timer__button[aria-disabled='true'] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    #{{ timer_id }} { padding: var(--p-space-200) var(--p-space-300); }
+
+    #{{ timer_id }} .countdown-timer__layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--p-space-200);
+      text-align: center;
+    }
+
+    #{{ timer_id }} .countdown-timer__clock,
+    #{{ timer_id }} .countdown-timer__button {
+      justify-self: center;
+    }
+
+    #{{ timer_id }} .countdown-timer__digit {
+      min-width: clamp(44px, 13vw, 52px);
+      min-height: 48px;
+      padding: var(--p-space-100);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #{{ timer_id }} { transition: none; }
+  }
+</style>
+
+<script>
+  (() => {
+    const root = document.getElementById({{ timer_id | json }});
+    if (!root || root.dataset.initialized === 'true') return;
+    root.dataset.initialized = 'true';
+
+    const storageKey = 'zoro_timer_session';
+    const durationMs = Math.max(1, Number({{ block.settings.duration_minutes | json }}) || 15) * 60 * 1000;
+    const message = root.querySelector('[data-timer-message]');
+    const clock = root.querySelector('[data-timer-clock]');
+    const button = root.querySelector('[data-timer-button]');
+    const hours = root.querySelector('[data-hours]');
+    const minutes = root.querySelector('[data-minutes]');
+    const seconds = root.querySelector('[data-seconds]');
+    let intervalId;
+
+    const readEndTime = () => {
+      try {
+        const value = Number(localStorage.getItem(storageKey));
+        return Number.isFinite(value) && value > 0 ? value : null;
+      } catch (error) {
+        return null;
+      }
+    };
+
+    let endTime = readEndTime();
+    if (endTime === null) {
+      endTime = Date.now() + durationMs;
+      try { localStorage.setItem(storageKey, String(endTime)); } catch (error) {}
+    }
+
+    const pad = (value) => String(value).padStart(2, '0');
+
+    const expire = () => {
+      clearInterval(intervalId);
+      hours.textContent = minutes.textContent = seconds.textContent = '00';
+      if (button) {
+        button.removeAttribute('href');
+        button.setAttribute('aria-disabled', 'true');
+        button.setAttribute('tabindex', '-1');
+      }
+
+      if ({{ block.settings.expiry_action | json }} === 'hide') {
+        root.classList.add('countdown-timer--hidden');
+      } else {
+        message.textContent = {{ block.settings.expired_text | json }};
+        clock.hidden = true;
+      }
+    };
+
+    const render = () => {
+      const remainingMs = Math.max(0, endTime - Date.now());
+      const totalSeconds = Math.ceil(remainingMs / 1000);
+      hours.textContent = pad(Math.floor(totalSeconds / 3600));
+      minutes.textContent = pad(Math.floor((totalSeconds % 3600) / 60));
+      seconds.textContent = pad(totalSeconds % 60);
+      if (remainingMs <= 0) expire();
+    };
+
+    render();
+    if (endTime > Date.now()) intervalId = setInterval(render, 250);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Sales countdown timer bar",
+  "target": "body",
+  "settings": [
+    { "type": "number", "id": "duration_minutes", "label": "Countdown length in minutes", "default": 15 },
+    { "type": "text", "id": "promo_text", "label": "Promo text", "default": "⚡ HURRY! Flash Sale Ends In:" },
+    { "type": "text", "id": "expired_text", "label": "Expired text", "default": "Offer expired!" },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "default": "top",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "expiry_action",
+      "label": "On expiry",
+      "default": "message",
+      "options": [
+        { "value": "hide", "label": "Hide bar" },
+        { "value": "message", "label": "Show expiry message" }
+      ]
+    },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "text", "id": "button_text", "label": "Button text", "default": "Shop sale" },
+    { "type": "color", "id": "background_color", "label": "Background color", "default": "#FFF3CD" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#202223" },
+    { "type": "color", "id": "accent_color", "label": "Timer accent color", "default": "#D72C0D" }
+  ]
+}
+{% endschema %}
