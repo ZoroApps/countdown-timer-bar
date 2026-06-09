@@ -1,0 +1,6 @@
+# Root reference configuration for the Countdown Timer theme app extension.
+# Shopify CLI discovers the deployable copy at:
+# extensions/countdown-timer/shopify.extension.toml
+
+name = "Countdown Timer"
+type = "theme"
