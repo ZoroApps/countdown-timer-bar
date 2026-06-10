@@ -1,133 +1,77 @@
-{{ 'timer.css' | asset_url | stylesheet_tag }}
-<script src="{{ 'timer.js' | asset_url }}" defer></script>
+<style>
+  .zoro-timer-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #202223;
+    color: #ffffff;
+    box-shadow: 0px -4px 12px rgba(0, 0, 0, 0.15);
+    padding: 12px 24px;
+    z-index: 2147483647;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .zoro-timer-bar.is-visible { display: flex; }
+  .zoro-timer-row { display: flex; align-items: center; gap: 16px; margin: 0 auto; max-width: 1200px; width: 100%; justify-content: space-between; }
+  .zoro-timer-clock { font-weight: 700; font-size: 18px; background: #333; padding: 4px 12px; border-radius: 4px; letter-spacing: 1px; color: #ffea00; }
+  .zoro-timer-btn { background: #008060; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; }
+</style>
 
-{% liquid
-  assign timer_id = 'countdown-timer-' | append: block.id
-  assign position_class = 'countdown-timer--' | append: block.settings.position
-%}
-
-<div
-  id="{{ timer_id }}"
-  class="countdown-timer {{ position_class }}"
-  data-countdown-timer
-  data-duration-minutes="{{ block.settings.duration_minutes }}"
-  data-expiry-action="{{ block.settings.expiry_action }}"
-  data-expired-text="{{ block.settings.expired_text | escape }}"
-  role="region"
-  aria-label="Sales countdown timer"
-  style="--p-color-bg-surface: {{ block.settings.background_color }}; --p-color-text: {{ block.settings.text_color }}; --p-color-bg-fill-brand: {{ block.settings.accent_color }};"
-  {{ block.shopify_attributes }}
->
-  <div class="countdown-timer__layout">
-    <p class="countdown-timer__message" data-timer-message>{{ block.settings.promo_text }}</p>
-
-    <div
-      class="countdown-timer__clock"
-      data-timer-clock
-      role="timer"
-      aria-live="off"
-      aria-label="Time remaining"
-    >
-      <span class="countdown-timer__digit">
-        <strong data-hours>00</strong>
-        <small>Hours</small>
-      </span>
-      <span class="countdown-timer__separator" aria-hidden="true">:</span>
-      <span class="countdown-timer__digit">
-        <strong data-minutes>00</strong>
-        <small>Minutes</small>
-      </span>
-      <span class="countdown-timer__separator" aria-hidden="true">:</span>
-      <span class="countdown-timer__digit">
-        <strong data-seconds>00</strong>
-        <small>Seconds</small>
-      </span>
+{% if template contains 'product' %}
+  <div class="zoro-timer-bar" id="ZoroCountdownTimerBar">
+    <div class="zoro-timer-row">
+      <div>⚡ HURRY! Flash Sale Ends In: <span class="zoro-timer-clock" id="ZoroClockDisplay">00:00</span></div>
+      <button class="zoro-timer-btn">Claim Discount Now</button>
     </div>
-
-    {% if block.settings.button_text != blank %}
-      <a
-        class="countdown-timer__button"
-        data-timer-button
-        href="{{ block.settings.button_link | default: routes.all_products_collection_url }}"
-      >
-        {{ block.settings.button_text }}
-      </a>
-    {% endif %}
   </div>
-</div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const timerBar = document.getElementById("ZoroCountdownTimerBar");
+      const clockDisplay = document.getElementById("ZoroClockDisplay");
+      
+      // Fixed evergreen 15-minute countdown clock logic via LocalStorage
+      let duration = 15 * 60; 
+      let endTime = localStorage.getItem("zoro_timer_end");
+
+      if (!endTime) {
+        endTime = Date.now() + (duration * 1000);
+        localStorage.setItem("zoro_timer_end", endTime);
+      }
+
+      function updateClock() {
+        let remaining = Math.round((endTime - Date.now()) / 1000);
+        
+        if (remaining <= 0) {
+          timerBar.style.display = "none";
+          localStorage.removeItem("zoro_timer_end");
+          return;
+        }
+
+        let minutes = Math.floor(remaining / 60);
+        let seconds = remaining % 60;
+        clockDisplay.textContent = 
+          (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+      }
+
+      window.addEventListener("scroll", function() {
+        if (window.scrollY > 300) { timerBar.classList.add("is-visible"); }
+        else { timerBar.classList.remove("is-visible"); }
+      });
+
+      setInterval(updateClock, 1000);
+      updateClock();
+    });
+  </script>
+{% endif %}
 
 {% schema %}
 {
-  "name": "Sales countdown timer bar",
+  "name": "Zoro Countdown Timer",
   "target": "body",
-  "settings": [
-    {
-      "type": "number",
-      "id": "duration_minutes",
-      "label": "Countdown length in minutes",
-      "default": 15
-    },
-    {
-      "type": "text",
-      "id": "promo_text",
-      "label": "Promo text",
-      "default": "⚡ HURRY! Flash Sale Ends In:"
-    },
-    {
-      "type": "text",
-      "id": "expired_text",
-      "label": "Expired text",
-      "default": "Offer expired!"
-    },
-    {
-      "type": "select",
-      "id": "position",
-      "label": "Position",
-      "default": "top",
-      "options": [
-        { "value": "top", "label": "Top" },
-        { "value": "bottom", "label": "Bottom" }
-      ]
-    },
-    {
-      "type": "select",
-      "id": "expiry_action",
-      "label": "On expiry",
-      "default": "message",
-      "options": [
-        { "value": "hide", "label": "Hide bar" },
-        { "value": "message", "label": "Show expired alert" }
-      ]
-    },
-    {
-      "type": "url",
-      "id": "button_link",
-      "label": "Button link"
-    },
-    {
-      "type": "text",
-      "id": "button_text",
-      "label": "Button text",
-      "default": "Shop sale"
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background color",
-      "default": "#FFF3CD"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text color",
-      "default": "#202223"
-    },
-    {
-      "type": "color",
-      "id": "accent_color",
-      "label": "Timer accent color",
-      "default": "#D72C0D"
-    }
-  ]
+  "settings": []
 }
 {% endschema %}
