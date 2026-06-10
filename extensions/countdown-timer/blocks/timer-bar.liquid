@@ -1,190 +1,77 @@
-{% liquid
-  assign timer_id = 'ZoroCountdownTimerBar-' | append: block.id
-  assign clock_id = 'ZoroClockDisplay-' | append: block.id
-%}
-
 <style>
-  #{{ timer_id }} {
-    background: {{ block.settings.background_color }};
-    color: {{ block.settings.text_color }};
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    padding: 14px 20px;
-    border-radius: 8px;
+  .zoro-timer-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #202223;
+    color: #ffffff;
+    box-shadow: 0px -4px 12px rgba(0, 0, 0, 0.15);
+    padding: 12px 24px;
+    z-index: 2147483647;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-
-  #{{ timer_id }} .zoro-timer-row {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
   }
-
-  #{{ timer_id }} .zoro-timer-message {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-  }
-
-  #{{ timer_id }} .zoro-timer-clock {
-    padding: 5px 12px;
-    color: {{ block.settings.clock_text_color }};
-    background: {{ block.settings.clock_background_color }};
-    border-radius: 4px;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    white-space: nowrap;
-  }
-
-  #{{ timer_id }} .zoro-timer-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 42px;
-    padding: 8px 16px;
-    color: #ffffff;
-    background: {{ block.settings.button_color }};
-    border-radius: 4px;
-    font-weight: 600;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  @media screen and (max-width: 749px) {
-    #{{ timer_id }} {
-      padding: 12px;
-    }
-
-    #{{ timer_id }} .zoro-timer-row {
-      flex-direction: column;
-      text-align: center;
-    }
-
-    #{{ timer_id }} .zoro-timer-message {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-  }
+  .zoro-timer-bar.is-visible { display: flex; }
+  .zoro-timer-row { display: flex; align-items: center; gap: 16px; margin: 0 auto; max-width: 1200px; width: 100%; justify-content: space-between; }
+  .zoro-timer-clock { font-weight: 700; font-size: 18px; background: #333; padding: 4px 12px; border-radius: 4px; letter-spacing: 1px; color: #ffea00; }
+  .zoro-timer-btn { background: #008060; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; }
 </style>
 
-<div
-  class="zoro-timer-bar"
-  id="{{ timer_id }}"
-  data-duration-minutes="{{ block.settings.duration_minutes }}"
-  {{ block.shopify_attributes }}
->
-  <div class="zoro-timer-row">
-    <div class="zoro-timer-message">
-      <span>{{ block.settings.promo_text }}</span>
-      <span class="zoro-timer-clock" id="{{ clock_id }}">00:00</span>
+{% if template contains 'product' %}
+  <div class="zoro-timer-bar" id="ZoroCountdownTimerBar">
+    <div class="zoro-timer-row">
+      <div>⚡ HURRY! Flash Sale Ends In: <span class="zoro-timer-clock" id="ZoroClockDisplay">00:00</span></div>
+      <button class="zoro-timer-btn">Claim Discount Now</button>
     </div>
-
-    {% if block.settings.button_text != blank %}
-      <a
-        class="zoro-timer-btn"
-        href="{{ block.settings.button_link | default: routes.all_products_collection_url }}"
-      >
-        {{ block.settings.button_text }}
-      </a>
-    {% endif %}
   </div>
-</div>
 
-<script>
-  (() => {
-    const timerBar = document.getElementById({{ timer_id | json }});
-    const clockDisplay = document.getElementById({{ clock_id | json }});
-    if (!timerBar || !clockDisplay || timerBar.dataset.initialized === 'true') return;
-    timerBar.dataset.initialized = 'true';
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const timerBar = document.getElementById("ZoroCountdownTimerBar");
+      const clockDisplay = document.getElementById("ZoroClockDisplay");
 
-    const storageKey = 'zoro_timer_end';
-    const durationSeconds = Math.max(1, Number(timerBar.dataset.durationMinutes) || 15) * 60;
-    let endTime = Number(localStorage.getItem(storageKey));
+      // Fixed evergreen 15-minute countdown clock logic via LocalStorage
+      let duration = 15 * 60;
+      let endTime = localStorage.getItem("zoro_timer_end");
 
-    if (!Number.isFinite(endTime) || endTime <= 0) {
-      endTime = Date.now() + durationSeconds * 1000;
-      localStorage.setItem(storageKey, String(endTime));
-    }
+      if (!endTime) {
+        endTime = Date.now() + (duration * 1000);
+        localStorage.setItem("zoro_timer_end", endTime);
+      }
 
-    const updateClock = () => {
-      const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
-      const minutes = Math.floor(remaining / 60);
-      const seconds = remaining % 60;
+      function updateClock() {
+        let remaining = Math.round((endTime - Date.now()) / 1000);
 
-      clockDisplay.textContent =
-        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        if (remaining <= 0) {
+          timerBar.style.display = "none";
+          localStorage.removeItem("zoro_timer_end");
+          return;
+        }
 
-      if (remaining <= 0) timerBar.hidden = true;
-    };
+        let minutes = Math.floor(remaining / 60);
+        let seconds = remaining % 60;
+        clockDisplay.textContent =
+          (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+      }
 
-    updateClock();
-    window.setInterval(updateClock, 1000);
-  })();
-</script>
+      window.addEventListener("scroll", function() {
+        if (window.scrollY > 300) { timerBar.classList.add("is-visible"); }
+        else { timerBar.classList.remove("is-visible"); }
+      });
+
+      setInterval(updateClock, 1000);
+      updateClock();
+    });
+  </script>
+{% endif %}
 
 {% schema %}
 {
   "name": "Zoro Countdown Timer",
-  "target": "section",
-  "settings": [
-    {
-      "type": "number",
-      "id": "duration_minutes",
-      "label": "Countdown minutes",
-      "default": 15
-    },
-    {
-      "type": "text",
-      "id": "promo_text",
-      "label": "Promo text",
-      "default": "⚡ HURRY! Flash Sale Ends In:"
-    },
-    {
-      "type": "text",
-      "id": "button_text",
-      "label": "Button text",
-      "default": "Claim Discount Now"
-    },
-    {
-      "type": "url",
-      "id": "button_link",
-      "label": "Button link"
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background color",
-      "default": "#202223"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text color",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "clock_background_color",
-      "label": "Clock background",
-      "default": "#333333"
-    },
-    {
-      "type": "color",
-      "id": "clock_text_color",
-      "label": "Clock text color",
-      "default": "#FFEA00"
-    },
-    {
-      "type": "color",
-      "id": "button_color",
-      "label": "Button color",
-      "default": "#008060"
-    }
-  ]
+  "target": "body",
+  "settings": []
 }
 {% endschema %}
