@@ -1,5 +1,5 @@
 {% liquid
-  assign timer_id = 'zoro-timer-' | append: block.id
+  assign timer_id = 'zoro-standalone-timer-' | append: block.id
   assign position_class = 'zoro-timer--' | append: block.settings.positioning
 %}
 
@@ -10,32 +10,15 @@
   aria-label="Sales countdown timer"
   {{ block.shopify_attributes }}
 >
-  <div class="zoro-timer__inner">
-    <div class="zoro-timer__metadata">
-      <p class="zoro-timer__promo" data-zoro-promo>{{ block.settings.promo_text }}</p>
-    </div>
+  <div class="zoro-timer__layout">
+    <p class="zoro-timer__promo" data-zoro-promo>{{ block.settings.promo_text }}</p>
 
-    <div
-      class="zoro-timer__clock"
-      data-zoro-clock
-      role="timer"
-      aria-live="off"
-      aria-label="Time remaining"
-    >
-      <span class="zoro-timer__digit-group">
-        <strong data-zoro-hours>00</strong>
-        <small>Hours</small>
-      </span>
+    <div class="zoro-timer__clock" data-zoro-clock role="timer" aria-label="Time remaining">
+      <span class="zoro-timer__digit"><strong data-zoro-hours>00</strong><small>Hours</small></span>
       <span class="zoro-timer__separator" aria-hidden="true">:</span>
-      <span class="zoro-timer__digit-group">
-        <strong data-zoro-minutes>00</strong>
-        <small>Minutes</small>
-      </span>
+      <span class="zoro-timer__digit"><strong data-zoro-minutes>00</strong><small>Minutes</small></span>
       <span class="zoro-timer__separator" aria-hidden="true">:</span>
-      <span class="zoro-timer__digit-group">
-        <strong data-zoro-seconds>00</strong>
-        <small>Seconds</small>
-      </span>
+      <span class="zoro-timer__digit"><strong data-zoro-seconds>00</strong><small>Seconds</small></span>
     </div>
 
     {% if block.settings.button_text != blank %}
@@ -52,7 +35,6 @@
 
 <style>
   #{{ timer_id }} {
-    /* Polaris-inspired design tokens, scoped to this app block. */
     --p-color-bg-surface: {{ block.settings.background_color }};
     --p-color-text: {{ block.settings.font_color }};
     --p-color-bg-fill-brand: {{ block.settings.digit_accent }};
@@ -86,13 +68,8 @@
     box-sizing: border-box;
   }
 
-  #{{ timer_id }}.zoro-timer--top {
-    top: 0;
-  }
-
-  #{{ timer_id }}.zoro-timer--bottom {
-    bottom: 0;
-  }
+  #{{ timer_id }}.zoro-timer--top { top: 0; }
+  #{{ timer_id }}.zoro-timer--bottom { bottom: 0; }
 
   #{{ timer_id }}.zoro-timer--hidden {
     visibility: hidden;
@@ -100,15 +77,10 @@
     pointer-events: none;
   }
 
-  #{{ timer_id }}.zoro-timer--top.zoro-timer--hidden {
-    transform: translateY(-100%);
-  }
+  #{{ timer_id }}.zoro-timer--top.zoro-timer--hidden { transform: translateY(-100%); }
+  #{{ timer_id }}.zoro-timer--bottom.zoro-timer--hidden { transform: translateY(100%); }
 
-  #{{ timer_id }}.zoro-timer--bottom.zoro-timer--hidden {
-    transform: translateY(100%);
-  }
-
-  #{{ timer_id }} .zoro-timer__inner {
+  #{{ timer_id }} .zoro-timer__layout {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -118,16 +90,11 @@
     margin: 0 auto;
   }
 
-  #{{ timer_id }} .zoro-timer__metadata {
-    min-width: 0;
-  }
-
   #{{ timer_id }} .zoro-timer__promo {
     margin: 0;
     font-size: clamp(0.92rem, 1.3vw, 1.08rem);
     font-weight: 700;
     line-height: 1.3;
-    letter-spacing: 0.01em;
   }
 
   #{{ timer_id }} .zoro-timer__clock {
@@ -137,7 +104,7 @@
     gap: var(--p-space-100);
   }
 
-  #{{ timer_id }} .zoro-timer__digit-group {
+  #{{ timer_id }} .zoro-timer__digit {
     display: grid;
     min-width: 58px;
     min-height: 54px;
@@ -151,13 +118,13 @@
     text-align: center;
   }
 
-  #{{ timer_id }} .zoro-timer__digit-group strong {
+  #{{ timer_id }} .zoro-timer__digit strong {
     font-size: clamp(1.15rem, 2vw, 1.5rem);
     font-variant-numeric: tabular-nums;
     line-height: 1;
   }
 
-  #{{ timer_id }} .zoro-timer__digit-group small {
+  #{{ timer_id }} .zoro-timer__digit small {
     margin-top: var(--p-space-100);
     font-size: 0.56rem;
     font-weight: 700;
@@ -167,8 +134,7 @@
   }
 
   #{{ timer_id }} .zoro-timer__separator {
-    color: var(--p-color-text);
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     font-weight: 700;
   }
 
@@ -177,98 +143,52 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    min-height: 42px;
+    min-height: 44px;
     padding: var(--p-space-200) var(--p-space-400);
     color: var(--p-color-text-on-color);
     background: var(--p-color-bg-fill-brand);
     border: 1px solid var(--p-color-border);
     border-radius: var(--p-border-radius-200);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
     font-size: 0.9rem;
     font-weight: 650;
-    line-height: 1.2;
     text-decoration: none;
     white-space: nowrap;
-    transition: filter 150ms ease, transform 150ms ease, opacity 150ms ease;
+    transition: filter 150ms ease, opacity 150ms ease;
   }
 
-  #{{ timer_id }} .zoro-timer__button:hover {
-    filter: brightness(0.92);
-  }
-
-  #{{ timer_id }} .zoro-timer__button:active {
-    transform: translateY(1px);
-  }
-
-  #{{ timer_id }} .zoro-timer__button:focus-visible {
-    outline: 3px solid var(--p-color-text-on-color);
-    outline-offset: 2px;
-  }
-
-  #{{ timer_id }} .zoro-timer__button[aria-disabled='true'] {
-    opacity: 0.5;
-    pointer-events: none;
-  }
+  #{{ timer_id }} .zoro-timer__button:hover { filter: brightness(0.92); }
+  #{{ timer_id }} .zoro-timer__button[aria-disabled='true'] { opacity: 0.5; pointer-events: none; }
 
   @media screen and (max-width: 749px) {
-    #{{ timer_id }} {
-      padding: clamp(8px, 2.5vw, 12px) clamp(8px, 3vw, 14px);
-    }
+    #{{ timer_id }} { padding: clamp(8px, 2.5vw, 12px) clamp(8px, 3vw, 14px); }
 
-    #{{ timer_id }} .zoro-timer__inner {
+    #{{ timer_id }} .zoro-timer__layout {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: var(--p-space-200) var(--p-space-300);
     }
 
-    #{{ timer_id }} .zoro-timer__metadata {
+    #{{ timer_id }} .zoro-timer__promo {
       grid-column: 1 / -1;
+      font-size: clamp(0.78rem, 3.5vw, 0.92rem);
       text-align: center;
     }
 
-    #{{ timer_id }} .zoro-timer__promo {
-      font-size: clamp(0.78rem, 3.5vw, 0.92rem);
-    }
-
-    #{{ timer_id }} .zoro-timer__clock {
-      justify-self: end;
-    }
-
-    #{{ timer_id }} .zoro-timer__digit-group {
-      min-width: clamp(44px, 13vw, 52px);
-      min-height: 48px;
-      padding-right: var(--p-space-100);
-      padding-left: var(--p-space-100);
-    }
-
-    #{{ timer_id }} .zoro-timer__separator {
-      font-size: 1.1rem;
-    }
-
-    #{{ timer_id }} .zoro-timer__button {
-      min-height: 44px;
-      padding-right: var(--p-space-300);
-      padding-left: var(--p-space-300);
-      font-size: 0.8rem;
-    }
+    #{{ timer_id }} .zoro-timer__clock { justify-self: end; }
+    #{{ timer_id }} .zoro-timer__digit { min-width: 44px; min-height: 46px; padding: var(--p-space-100); }
+    #{{ timer_id }} .zoro-timer__separator { font-size: 1.05rem; }
+    #{{ timer_id }} .zoro-timer__button { padding: var(--p-space-200) var(--p-space-300); font-size: 0.8rem; }
   }
 
   @media screen and (max-width: 430px) {
-    #{{ timer_id }} .zoro-timer__inner {
-      grid-template-columns: 1fr;
-    }
-
+    #{{ timer_id }} .zoro-timer__layout { grid-template-columns: 1fr; }
     #{{ timer_id }} .zoro-timer__clock,
-    #{{ timer_id }} .zoro-timer__button {
-      justify-self: center;
-    }
+    #{{ timer_id }} .zoro-timer__button { justify-self: center; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     #{{ timer_id }},
-    #{{ timer_id }} .zoro-timer__button {
-      transition: none;
-    }
+    #{{ timer_id }} .zoro-timer__button { transition: none; }
   }
 </style>
 
@@ -290,22 +210,22 @@
     const minutes = container.querySelector('[data-zoro-minutes]');
     const seconds = container.querySelector('[data-zoro-seconds]');
     let intervalId = null;
-    let hasExpired = false;
+    let expired = false;
 
     const readEndTime = () => {
       try {
-        const storedValue = Number(window.localStorage.getItem(storageKey));
-        return Number.isFinite(storedValue) && storedValue > 0 ? storedValue : null;
+        const value = Number(window.localStorage.getItem(storageKey));
+        return Number.isFinite(value) && value > 0 ? value : null;
       } catch (error) {
         return null;
       }
     };
 
-    const writeEndTime = (endTime) => {
+    const writeEndTime = (value) => {
       try {
-        window.localStorage.setItem(storageKey, String(endTime));
+        window.localStorage.setItem(storageKey, String(value));
       } catch (error) {
-        // Browsers that block LocalStorage still receive a stable in-page countdown.
+        // Continue with the in-memory timestamp if storage is unavailable.
       }
     };
 
@@ -325,20 +245,19 @@
     };
 
     const expire = () => {
-      if (hasExpired) return;
-      hasExpired = true;
+      if (expired) return;
+      expired = true;
       if (intervalId !== null) window.clearInterval(intervalId);
-
       hours.textContent = '00';
       minutes.textContent = '00';
       seconds.textContent = '00';
-      clock.setAttribute('aria-label', 'Offer expired');
       disableButton();
 
       if (expiryAction === 'hide') {
         container.classList.add('zoro-timer--hidden');
       } else {
         promo.textContent = expiredText;
+        promo.setAttribute('role', 'alert');
         clock.hidden = true;
       }
     };
@@ -346,16 +265,14 @@
     const render = () => {
       const remainingMs = Math.max(0, endTime - Date.now());
       const totalSeconds = Math.ceil(remainingMs / 1000);
-
       hours.textContent = pad(Math.floor(totalSeconds / 3600));
       minutes.textContent = pad(Math.floor((totalSeconds % 3600) / 60));
       seconds.textContent = pad(totalSeconds % 60);
-
       if (remainingMs <= 0) expire();
     };
 
     render();
-    if (!hasExpired) intervalId = window.setInterval(render, 250);
+    if (!expired) intervalId = window.setInterval(render, 250);
 
     window.addEventListener('storage', (event) => {
       if (event.key !== storageKey) return;
@@ -372,85 +289,34 @@
   "name": "Sales countdown timer bar",
   "target": "body",
   "settings": [
-    {
-      "type": "number",
-      "id": "countdown_minutes",
-      "label": "Countdown length in minutes",
-      "default": 15
-    },
-    {
-      "type": "text",
-      "id": "promo_text",
-      "label": "Promo text string",
-      "default": "⚡ HURRY! Flash Sale Ends In:"
-    },
-    {
-      "type": "text",
-      "id": "expired_text",
-      "label": "Expired text string",
-      "default": "Offer expired!"
-    },
+    { "type": "number", "id": "countdown_minutes", "label": "Countdown length in minutes", "default": 15 },
+    { "type": "text", "id": "promo_text", "label": "Promo text string", "default": "HURRY! Flash Sale Ends In:" },
+    { "type": "text", "id": "expired_text", "label": "Expired text string", "default": "Offer expired!" },
     {
       "type": "select",
       "id": "positioning",
       "label": "Positioning",
       "default": "top",
       "options": [
-        {
-          "value": "top",
-          "label": "Top"
-        },
-        {
-          "value": "bottom",
-          "label": "Bottom"
-        }
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" }
       ]
     },
     {
       "type": "select",
       "id": "expiry_action",
-      "label": "On expiry action",
+      "label": "On Expiry Action",
       "default": "message",
       "options": [
-        {
-          "value": "hide",
-          "label": "Hide Bar"
-        },
-        {
-          "value": "message",
-          "label": "Show Expiry Message"
-        }
+        { "value": "hide", "label": "Hide Bar" },
+        { "value": "message", "label": "Show Expiry Message" }
       ]
     },
-    {
-      "type": "url",
-      "id": "button_link",
-      "label": "Button link URL"
-    },
-    {
-      "type": "text",
-      "id": "button_text",
-      "label": "Button text label",
-      "default": "Shop sale"
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background color",
-      "default": "#FFF3CD"
-    },
-    {
-      "type": "color",
-      "id": "font_color",
-      "label": "Font text color",
-      "default": "#202223"
-    },
-    {
-      "type": "color",
-      "id": "digit_accent",
-      "label": "Timer digit accent",
-      "default": "#D72C0D"
-    }
+    { "type": "url", "id": "button_link", "label": "Button link URL" },
+    { "type": "text", "id": "button_text", "label": "Button text label", "default": "Shop sale" },
+    { "type": "color", "id": "background_color", "label": "Background color", "default": "#FFF3CD" },
+    { "type": "color", "id": "font_color", "label": "Font text color", "default": "#202223" },
+    { "type": "color", "id": "digit_accent", "label": "Timer digit accent", "default": "#D72C0D" }
   ]
 }
 {% endschema %}
