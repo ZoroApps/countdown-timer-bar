@@ -1,6 +1,8 @@
-client_id = ""
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "65d429496ba14fc46cf5dec321399ec3"
 name = "Zoro Countdown Timer Bar"
-application_url = "https://shopify.dev"
+application_url = "https://shopify.dev/apps/default-app-home"
 embedded = true
 
 [build]
@@ -18,4 +20,4 @@ embedded_app_direct_api_access = true
 scopes = ""
 
 [auth]
-redirect_urls = [ "https://shopify.dev/api/auth" ]
+redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
