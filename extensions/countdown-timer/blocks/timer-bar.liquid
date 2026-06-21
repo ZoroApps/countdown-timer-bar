@@ -40,6 +40,15 @@
         { "value": "cart", "label": "Cart page only" }
       ]
     },
+    { "type": "header", "content": "Product and collection targeting" },
+    { "type": "checkbox", "id": "catalog_targeting_enabled", "label": "Only show for matching catalog rules", "default": false },
+    { "type": "textarea", "id": "include_product_handles", "label": "Include product handles", "info": "Comma-separated. Example: classic-shirt, leather-bag" },
+    { "type": "textarea", "id": "include_vendors", "label": "Include product vendors", "info": "Comma-separated vendor names." },
+    { "type": "textarea", "id": "include_product_types", "label": "Include product types", "info": "Comma-separated product types." },
+    { "type": "textarea", "id": "include_product_tags", "label": "Include product tags", "info": "Comma-separated tags. Any matching tag displays the timer." },
+    { "type": "textarea", "id": "include_collections", "label": "Include collection handles", "info": "Comma-separated. Works on collection pages and products inside those collections." },
+    { "type": "textarea", "id": "exclude_product_handles", "label": "Exclude product handles", "info": "Excluded products always remain hidden." },
+    { "type": "textarea", "id": "exclude_vendors", "label": "Exclude product vendors", "info": "Excluded vendors always remain hidden." },
     {
       "type": "select",
       "id": "device_visibility",
