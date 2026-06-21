@@ -1,256 +1,47 @@
 {% liquid
-  assign timer_id = 'zoro-countdown-' | append: display_mode | append: '-' | append: block.id
+  assign timer_id = 'zoro-countdown-embed-' | append: block.id
   assign position_class = 'zoro-timer--' | append: block.settings.positioning
+  assign preset_class = 'zoro-timer--' | append: block.settings.design_preset
 %}
 
-<div
-  id="{{ timer_id }}"
-  class="zoro-timer zoro-timer--{{ display_mode }}{% if display_mode == 'embed' %} {{ position_class }}{% endif %}"
-  data-zoro-timer-instance
-  data-zoro-mode="{{ display_mode }}"
-  role="region"
-  aria-label="Sales countdown timer"
-  {{ block.shopify_attributes }}
->
+<div id="{{ timer_id }}" class="zoro-timer zoro-timer--embed {{ position_class }} {{ preset_class }}" role="region" aria-label="Sales countdown timer" hidden {{ block.shopify_attributes }}>
   <div class="zoro-timer__layout">
     <p class="zoro-timer__promo" data-zoro-promo>{{ block.settings.promo_text }}</p>
     <div class="zoro-timer__clock" data-zoro-clock role="timer" aria-label="Time remaining">
-      <span class="zoro-timer__digit"><strong data-zoro-days>00</strong></span>
+      <span class="zoro-timer__unit" data-zoro-days-unit><span class="zoro-timer__digit"><strong data-zoro-days>00</strong></span>{% if block.settings.show_labels %}<small>{{ block.settings.days_label }}</small>{% endif %}</span>
+      <span class="zoro-timer__separator" data-zoro-days-separator aria-hidden="true">:</span>
+      <span class="zoro-timer__unit"><span class="zoro-timer__digit"><strong data-zoro-hours>00</strong></span>{% if block.settings.show_labels %}<small>{{ block.settings.hours_label }}</small>{% endif %}</span>
       <span class="zoro-timer__separator" aria-hidden="true">:</span>
-      <span class="zoro-timer__digit"><strong data-zoro-hours>00</strong></span>
+      <span class="zoro-timer__unit"><span class="zoro-timer__digit"><strong data-zoro-minutes>00</strong></span>{% if block.settings.show_labels %}<small>{{ block.settings.minutes_label }}</small>{% endif %}</span>
       <span class="zoro-timer__separator" aria-hidden="true">:</span>
-      <span class="zoro-timer__digit"><strong data-zoro-minutes>00</strong></span>
-      <span class="zoro-timer__separator" aria-hidden="true">:</span>
-      <span class="zoro-timer__digit"><strong data-zoro-seconds>00</strong></span>
+      <span class="zoro-timer__unit"><span class="zoro-timer__digit"><strong data-zoro-seconds>00</strong></span>{% if block.settings.show_labels %}<small>{{ block.settings.seconds_label }}</small>{% endif %}</span>
     </div>
-    {% if block.settings.button_text != blank %}
-      <a class="zoro-timer__button" data-zoro-button href="{{ block.settings.button_link | default: routes.all_products_collection_url }}">
-        {{ block.settings.button_text }}
-      </a>
-    {% endif %}
+    {% if block.settings.button_text != blank %}<a class="zoro-timer__button" data-zoro-button href="{{ block.settings.button_link | default: routes.all_products_collection_url }}">{{ block.settings.button_text }}</a>{% endif %}
+    {% if block.settings.dismissible %}<button class="zoro-timer__close" data-zoro-close type="button" aria-label="Close countdown">&times;</button>{% endif %}
   </div>
 </div>
 
 <style>
-  #{{ timer_id }} {
-    --zoro-bg: {{ block.settings.background_color }};
-    --zoro-text: {{ block.settings.font_color }};
-    --zoro-accent: {{ block.settings.digit_accent }};
-    box-sizing: border-box;
-    width: 100%;
-    padding: 4px 12px;
-    color: var(--zoro-text);
-    background: var(--zoro-bg);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    transition: opacity 260ms ease, visibility 260ms ease, transform 260ms ease;
-  }
-
-  #{{ timer_id }}[hidden] { display: none !important; }
-  #{{ timer_id }} *, #{{ timer_id }} *::before, #{{ timer_id }} *::after { box-sizing: border-box; }
-  #{{ timer_id }}.zoro-timer--embed { position: fixed; right: 0; left: 0; z-index: 2147483647; }
-  #{{ timer_id }}.zoro-timer--top { top: 0; }
-  #{{ timer_id }}.zoro-timer--bottom { bottom: 0; }
-  #{{ timer_id }}.zoro-timer--section { position: relative; z-index: 1; }
-  #{{ timer_id }}.zoro-timer--hidden { visibility: hidden; opacity: 0; pointer-events: none; }
-  #{{ timer_id }}.zoro-timer--top.zoro-timer--hidden { transform: translateY(-100%); }
-  #{{ timer_id }}.zoro-timer--bottom.zoro-timer--hidden { transform: translateY(100%); }
-
-  #{{ timer_id }} .zoro-timer__layout {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  #{{ timer_id }} .zoro-timer__promo {
-    margin: 0;
-    overflow: hidden;
-    font-size: clamp(0.68rem, 1vw, 0.78rem);
-    font-weight: 650;
-    line-height: 1;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  #{{ timer_id }} .zoro-timer__clock { display: flex; flex-shrink: 0; align-items: center; gap: 2px; }
-  #{{ timer_id }} .zoro-timer__digit {
-    display: grid;
-    min-width: 28px;
-    min-height: 24px;
-    place-content: center;
-    padding: 2px 4px;
-    color: #ffffff;
-    background: var(--zoro-accent);
-    border: 1px solid rgba(0, 0, 0, 0.16);
-    border-radius: 4px;
-    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.16);
-    text-align: center;
-  }
-
-  #{{ timer_id }} .zoro-timer__digit strong {
-    font-size: clamp(0.72rem, 1.2vw, 0.82rem);
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-  }
-
-  #{{ timer_id }} .zoro-timer__separator { font-size: 0.7rem; font-weight: 700; }
-  #{{ timer_id }} .zoro-timer__button {
-    display: inline-flex;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    min-height: 24px;
-    padding: 2px 8px;
-    color: #ffffff;
-    background: var(--zoro-accent);
-    border: 1px solid rgba(0, 0, 0, 0.16);
-    border-radius: 4px;
-    font-size: 0.66rem;
-    font-weight: 650;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  #{{ timer_id }} .zoro-timer__button:hover { filter: brightness(0.92); }
-  #{{ timer_id }} .zoro-timer__button[aria-disabled='true'] { opacity: 0.5; pointer-events: none; }
-
-  @media screen and (max-width: 749px) {
-    #{{ timer_id }} { padding: 3px 6px; }
-    #{{ timer_id }} .zoro-timer__layout { gap: 4px; }
-    #{{ timer_id }} .zoro-timer__promo { flex: 1 1 auto; font-size: clamp(0.58rem, 2.4vw, 0.68rem); }
-    #{{ timer_id }} .zoro-timer__digit { min-width: 25px; min-height: 22px; padding: 1px 3px; }
-    #{{ timer_id }} .zoro-timer__digit strong { font-size: 0.68rem; }
-    #{{ timer_id }} .zoro-timer__separator { font-size: 0.62rem; }
-    #{{ timer_id }} .zoro-timer__button { min-height: 22px; padding: 2px 5px; font-size: 0.58rem; }
-  }
-
-  @media screen and (max-width: 480px) { #{{ timer_id }} .zoro-timer__button { display: none; } }
-  @media (prefers-reduced-motion: reduce) { #{{ timer_id }}, #{{ timer_id }} .zoro-timer__button { transition: none; } }
+#{{ timer_id }}{--zoro-bg:{{ block.settings.background_color }};--zoro-text:{{ block.settings.font_color }};--zoro-accent:{{ block.settings.digit_accent }};position:fixed;right:0;left:0;z-index:2147483647;box-sizing:border-box;width:100%;padding:4px 12px;color:var(--zoro-text);background:var(--zoro-bg);box-shadow:0 1px 4px rgba(0,0,0,.12);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;transition:opacity .22s ease,visibility .22s ease,transform .22s ease}#{{ timer_id }}[hidden]{display:none!important}#{{ timer_id }} *,#{{ timer_id }} *::before,#{{ timer_id }} *::after{box-sizing:border-box}#{{ timer_id }}.zoro-timer--top{top:0}#{{ timer_id }}.zoro-timer--bottom{bottom:0}#{{ timer_id }}.zoro-timer--hidden{visibility:hidden;opacity:0;pointer-events:none}#{{ timer_id }}.zoro-timer--top.zoro-timer--hidden{transform:translateY(-100%)}#{{ timer_id }}.zoro-timer--bottom.zoro-timer--hidden{transform:translateY(100%)}
+#{{ timer_id }} .zoro-timer__layout{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:1200px;margin:0 auto}#{{ timer_id }} .zoro-timer__promo{margin:0;overflow:hidden;font-size:clamp(.68rem,1vw,.78rem);font-weight:650;line-height:1.1;text-overflow:ellipsis;white-space:nowrap}#{{ timer_id }} .zoro-timer__clock{display:flex;flex-shrink:0;align-items:flex-start;gap:2px}#{{ timer_id }} .zoro-timer__unit{display:grid;justify-items:center;gap:2px}#{{ timer_id }} .zoro-timer__unit small{color:var(--zoro-text);font-size:.48rem;font-weight:600;line-height:1;opacity:.75}#{{ timer_id }} .zoro-timer__digit{display:grid;min-width:28px;min-height:24px;place-content:center;padding:2px 4px;color:#fff;background:var(--zoro-accent);border:1px solid rgba(0,0,0,.16);border-radius:4px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.16)}#{{ timer_id }} .zoro-timer__digit strong{font-size:clamp(.72rem,1.2vw,.82rem);font-variant-numeric:tabular-nums;line-height:1}#{{ timer_id }} .zoro-timer__separator{padding-top:7px;font-size:.7rem;font-weight:700}
+#{{ timer_id }} .zoro-timer__button{display:inline-flex;flex-shrink:0;align-items:center;justify-content:center;min-height:24px;padding:2px 8px;color:#fff;background:var(--zoro-accent);border:1px solid rgba(0,0,0,.16);border-radius:4px;font-size:.66rem;font-weight:650;text-decoration:none;white-space:nowrap}#{{ timer_id }} .zoro-timer__button:hover{filter:brightness(.92)}#{{ timer_id }} .zoro-timer__button[aria-disabled=true]{opacity:.5;pointer-events:none}#{{ timer_id }} .zoro-timer__close{display:grid;flex:0 0 24px;width:24px;height:24px;place-content:center;padding:0;color:var(--zoro-text);background:transparent;border:0;border-radius:4px;font:inherit;font-size:1rem;cursor:pointer;opacity:.72}#{{ timer_id }} .zoro-timer__close:hover{background:rgba(0,0,0,.08);opacity:1}#{{ timer_id }}.zoro-timer--minimal{box-shadow:none}#{{ timer_id }}.zoro-timer--minimal .zoro-timer__digit{min-width:24px;color:var(--zoro-accent);background:transparent;border-color:transparent;box-shadow:none}#{{ timer_id }}.zoro-timer--urgent{background:linear-gradient(90deg,var(--zoro-bg),color-mix(in srgb,var(--zoro-bg),#fff 14%),var(--zoro-bg));background-size:200% 100%;animation:zoroUrgencyShift 2.4s ease-in-out infinite}@keyframes zoroUrgencyShift{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+@media(max-width:749px){#{{ timer_id }}{padding:3px 6px}#{{ timer_id }} .zoro-timer__layout{gap:4px}#{{ timer_id }} .zoro-timer__promo{flex:1 1 auto;font-size:clamp(.58rem,2.4vw,.68rem)}#{{ timer_id }} .zoro-timer__digit{min-width:25px;min-height:22px;padding:1px 3px}#{{ timer_id }} .zoro-timer__digit strong{font-size:.68rem}#{{ timer_id }} .zoro-timer__separator{padding-top:6px;font-size:.62rem}#{{ timer_id }} .zoro-timer__button{min-height:22px;padding:2px 5px;font-size:.58rem}#{{ timer_id }} .zoro-timer__close{flex-basis:22px;width:22px;height:22px}}@media(max-width:480px){#{{ timer_id }} .zoro-timer__button,#{{ timer_id }} .zoro-timer__unit small{display:none}}@media(prefers-reduced-motion:reduce){#{{ timer_id }},#{{ timer_id }}.zoro-timer--urgent{transition:none;animation:none}}
 </style>
 
 <script>
-  (() => {
-    const timerId = {{ timer_id | json }};
-    const container = document.getElementById(timerId);
-    if (!container || container.dataset.zoroInitialized === 'true') return;
-    container.dataset.zoroInitialized = 'true';
-
-    const storageKey = 'zoro_timer_saved_session_v3';
-    const durationDays = Math.max(0, Math.min(30, Number({{ block.settings.countdown_days | json }}) || 0));
-    const durationHours = Math.max(0, Math.min(23, Number({{ block.settings.countdown_hours | json }}) || 0));
-    const durationMinutes = Math.max(0, Math.min(59, Number({{ block.settings.countdown_minutes | json }}) || 0));
-    const durationMs = Math.max(60000, ((durationDays * 1440) + (durationHours * 60) + durationMinutes) * 60000);
-    const durationSignature = [durationDays, durationHours, durationMinutes].join(':');
-    const expiryAction = {{ block.settings.expiry_action | json }};
-    const expiredText = {{ block.settings.expired_text | json }};
-    const mode = {{ display_mode | json }};
-    const promo = container.querySelector('[data-zoro-promo]');
-    const clock = container.querySelector('[data-zoro-clock]');
-    const button = container.querySelector('[data-zoro-button]');
-    const days = container.querySelector('[data-zoro-days]');
-    const hours = container.querySelector('[data-zoro-hours]');
-    const minutes = container.querySelector('[data-zoro-minutes]');
-    const seconds = container.querySelector('[data-zoro-seconds]');
-    let intervalId = null;
-    let expired = false;
-    let endTime = null;
-
-    const readSession = () => {
-      try {
-        const value = JSON.parse(localStorage.getItem(storageKey));
-        if (!value || !Number.isFinite(Number(value.endTime))) return null;
-        return { endTime: Number(value.endTime), durationSignature: String(value.durationSignature) };
-      } catch (error) { return null; }
-    };
-
-    const writeSession = (nextEndTime) => {
-      try { localStorage.setItem(storageKey, JSON.stringify({ endTime: nextEndTime, durationSignature })); }
-      catch (error) { /* Continue in memory if storage is unavailable. */ }
-    };
-
-    const pad = (value) => String(value).padStart(2, '0');
-    const expire = () => {
-      if (expired) return;
-      expired = true;
-      if (intervalId !== null) clearInterval(intervalId);
-      intervalId = null;
-      days.textContent = hours.textContent = minutes.textContent = seconds.textContent = '00';
-      if (button) {
-        button.removeAttribute('href');
-        button.setAttribute('aria-disabled', 'true');
-        button.setAttribute('tabindex', '-1');
-      }
-      if (expiryAction === 'hide') container.classList.add('zoro-timer--hidden');
-      else {
-        promo.textContent = expiredText;
-        promo.setAttribute('role', 'alert');
-        clock.hidden = true;
-      }
-    };
-
-    const render = () => {
-      const remainingMs = Math.max(0, endTime - Date.now());
-      const totalSeconds = Math.ceil(remainingMs / 1000);
-      days.textContent = pad(Math.floor(totalSeconds / 86400));
-      hours.textContent = pad(Math.floor((totalSeconds % 86400) / 3600));
-      minutes.textContent = pad(Math.floor((totalSeconds % 3600) / 60));
-      seconds.textContent = pad(totalSeconds % 60);
-      if (remainingMs <= 0) expire();
-    };
-
-    const stop = () => {
-      if (intervalId !== null) clearInterval(intervalId);
-      intervalId = null;
-      container.hidden = true;
-    };
-
-    const start = () => {
-      container.hidden = false;
-      if (intervalId !== null || expired) return;
-      const session = readSession();
-      const sessionMatches = Boolean(session && session.durationSignature === durationSignature);
-      endTime = sessionMatches ? session.endTime : Date.now() + durationMs;
-      if (!sessionMatches) writeSession(endTime);
-      render();
-      if (!expired) {
-        intervalId = setInterval(() => {
-          if (!container.isConnected) {
-            stop();
-            window.ZoroTimerRegistry.remove(timerId);
-            return;
-          }
-          render();
-        }, 250);
-      }
-    };
-
-    window.ZoroTimerRegistry = window.ZoroTimerRegistry || {
-      instances: new Map(),
-      add(instance) { this.instances.set(instance.id, instance); this.activate(); },
-      remove(id) { this.instances.delete(id); this.activate(); },
-      activate() {
-        const connected = [...this.instances.values()].filter((instance) => instance.element.isConnected);
-        const selected = connected.find((instance) => instance.mode === 'section') || connected[0];
-        connected.forEach((instance) => {
-          if (selected && instance.id === selected.id) instance.start();
-          else instance.stop();
-        });
-      }
-    };
-
-    window.ZoroTimerRegistry.add({ id: timerId, mode, element: container, start, stop });
-    addEventListener('storage', (event) => {
-      if (event.key !== storageKey || container.hidden) return;
-      const syncedSession = readSession();
-      if (!syncedSession) return;
-      endTime = syncedSession.endTime;
-      render();
-    });
-    document.addEventListener('shopify:section:load', () => window.ZoroTimerRegistry.activate());
-    document.addEventListener('shopify:section:unload', () => window.ZoroTimerRegistry.activate());
-  })();
+(()=>{const timerId={{ timer_id | json }},container=document.getElementById(timerId);if(!container||container.dataset.zoroInitialized==='true')return;container.dataset.zoroInitialized='true';
+const config={mode:{{ block.settings.timer_mode | json }},days:Math.max(0,Math.min(30,Number({{ block.settings.countdown_days | json }})||0)),hours:Math.max(0,Math.min(23,Number({{ block.settings.countdown_hours | json }})||0)),minutes:Math.max(0,Math.min(59,Number({{ block.settings.countdown_minutes | json }})||0)),fixedEnd:{{ block.settings.fixed_end | json }},dailyHour:Math.max(0,Math.min(23,Number({{ block.settings.daily_end_hour | json }})||0)),dailyMinute:Math.max(0,Math.min(59,Number({{ block.settings.daily_end_minute | json }})||0)),resetToken:String({{ block.settings.reset_token | json }}),pageVisibility:{{ block.settings.page_visibility | json }},deviceVisibility:{{ block.settings.device_visibility | json }},expiryAction:{{ block.settings.expiry_action | json }},expiredText:{{ block.settings.expired_text | json }},pageType:{{ request.page_type | json }}};
+const sessionKey='zoro_timer_session_v4',dismissedKey='zoro_timer_dismissed_v1',promo=container.querySelector('[data-zoro-promo]'),clock=container.querySelector('[data-zoro-clock]'),button=container.querySelector('[data-zoro-button]'),closeButton=container.querySelector('[data-zoro-close]'),dayUnit=container.querySelector('[data-zoro-days-unit]'),daySeparator=container.querySelector('[data-zoro-days-separator]'),days=container.querySelector('[data-zoro-days]'),hours=container.querySelector('[data-zoro-hours]'),minutes=container.querySelector('[data-zoro-minutes]'),seconds=container.querySelector('[data-zoro-seconds]'),originalPromo=promo.textContent,originalButtonHref=button?.getAttribute('href')||'';let intervalId=null,cartPollId=null,endTime=0,expired=false;
+const readJson=key=>{try{return JSON.parse(localStorage.getItem(key))}catch(error){return null}},writeJson=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch(error){}},removeStored=key=>{try{localStorage.removeItem(key)}catch(error){}};
+const isTargetPage=()=>config.pageVisibility==='all'||(config.pageVisibility==='home'?config.pageType==='index':config.pageType===config.pageVisibility),isTargetDevice=()=>config.deviceVisibility==='all'||config.deviceVisibility===(matchMedia('(max-width:749px)').matches?'mobile':'desktop');
+const durationMs=Math.max(60000,((config.days*1440)+(config.hours*60)+config.minutes)*60000),signature=[config.mode,config.days,config.hours,config.minutes,config.fixedEnd,config.dailyHour,config.dailyMinute,config.resetToken].join('|');
+const getFixedEnd=()=>{const parsed=Date.parse(config.fixedEnd);return Number.isFinite(parsed)?parsed:0},getDailyEnd=()=>{const now=new Date(),target=new Date(now);target.setHours(config.dailyHour,config.dailyMinute,0,0);if(target.getTime()<=now.getTime())target.setDate(target.getDate()+1);return target.getTime()},getEvergreenEnd=()=>{const session=readJson(sessionKey);if(session&&session.signature===signature&&Number.isFinite(Number(session.endTime))&&Number(session.endTime)>Date.now())return Number(session.endTime);const nextEnd=Date.now()+durationMs;writeJson(sessionKey,{signature,endTime:nextEnd});return nextEnd};
+const getCart=async()=>{try{const response=await fetch('/cart.js',{credentials:'same-origin',headers:{Accept:'application/json'}});return response.ok?await response.json():null}catch(error){return null}};
+const pad=value=>String(value).padStart(2,'0');
+const expire=()=>{if(expired)return;expired=true;if(intervalId!==null)clearInterval(intervalId);intervalId=null;days.textContent=hours.textContent=minutes.textContent=seconds.textContent='00';if(button){button.removeAttribute('href');button.setAttribute('aria-disabled','true');button.setAttribute('tabindex','-1')}if(config.expiryAction==='hide')container.classList.add('zoro-timer--hidden');else{promo.textContent=config.expiredText;promo.setAttribute('role','alert');clock.hidden=true}};
+const render=()=>{if(!endTime)return;const remainingMs=Math.max(0,endTime-Date.now()),totalSeconds=Math.ceil(remainingMs/1000);days.textContent=pad(Math.floor(totalSeconds/86400));hours.textContent=pad(Math.floor((totalSeconds%86400)/3600));minutes.textContent=pad(Math.floor((totalSeconds%3600)/60));seconds.textContent=pad(totalSeconds%60);dayUnit.hidden=totalSeconds<86400;daySeparator.hidden=totalSeconds<86400;if(remainingMs<=0){if(config.mode==='daily'){endTime=getDailyEnd();return}expire()}};
+const ensureTicker=()=>{if(!endTime||endTime<=Date.now()||expired||intervalId!==null)return;render();intervalId=setInterval(render,250)};
+const setCartState=async()=>{const cart=await getCart();if(!cart)return;if(Number(cart.item_count)<=0){removeStored(sessionKey);if(intervalId!==null)clearInterval(intervalId);intervalId=null;endTime=0;expired=false;promo.textContent=originalPromo;clock.hidden=false;container.classList.remove('zoro-timer--hidden');if(button&&originalButtonHref){button.setAttribute('href',originalButtonHref);button.removeAttribute('aria-disabled');button.removeAttribute('tabindex')}container.hidden=true;return}container.hidden=false;if(!endTime&&!expired)endTime=getEvergreenEnd();ensureTicker()};
+const initialize=async()=>{if(!isTargetPage()||!isTargetDevice())return;const dismissed=readJson(dismissedKey);if(dismissed&&dismissed.signature===signature)return;if(config.mode==='fixed')endTime=getFixedEnd();else if(config.mode==='daily')endTime=getDailyEnd();else endTime=getEvergreenEnd();if(config.mode==='cart'){await setCartState();cartPollId=setInterval(setCartState,3000);document.addEventListener('cart:refresh',setCartState);document.addEventListener('cart:updated',setCartState);return}container.hidden=false;if(!endTime||endTime<=Date.now())expire();else ensureTicker()};
+if(closeButton)closeButton.addEventListener('click',()=>{writeJson(dismissedKey,{signature,dismissedAt:Date.now()});container.classList.add('zoro-timer--hidden')});addEventListener('storage',event=>{if(event.key===sessionKey&&['evergreen','cart'].includes(config.mode)){endTime=getEvergreenEnd();render()}if(event.key===dismissedKey&&readJson(dismissedKey)?.signature===signature)container.classList.add('zoro-timer--hidden')});addEventListener('resize',()=>{if(config.mode!=='cart')container.hidden=!(isTargetPage()&&isTargetDevice())});addEventListener('pagehide',()=>{if(intervalId!==null)clearInterval(intervalId);if(cartPollId!==null)clearInterval(cartPollId)},{once:true});initialize()})();
 </script>
