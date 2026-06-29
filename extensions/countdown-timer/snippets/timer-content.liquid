@@ -56,16 +56,22 @@
     --zoro-bg: {{ block.settings.background_color }};
     --zoro-text: {{ block.settings.font_color }};
     --zoro-accent: {{ block.settings.digit_accent }};
+    --zoro-muted: color-mix(in srgb, var(--zoro-text), transparent 28%);
+    --zoro-line: color-mix(in srgb, var(--zoro-text), transparent 84%);
+    --zoro-raised: color-mix(in srgb, var(--zoro-bg), var(--zoro-text) 7%);
     position: fixed;
     right: 0;
     left: 0;
     z-index: 2147483647;
     box-sizing: border-box;
     width: 100%;
-    padding: 4px 12px;
+    padding: 8px 18px;
     color: var(--zoro-text);
-    background: var(--zoro-bg);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.08)),
+      var(--zoro-bg);
+    border-block: 1px solid var(--zoro-line);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     transition: opacity 220ms ease, visibility 220ms ease, transform 220ms ease;
   }
@@ -82,70 +88,111 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 14px;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1180px;
     margin: 0 auto;
   }
 
   #{{ timer_id }} .zoro-timer__promo {
     margin: 0;
     overflow: hidden;
-    font-size: clamp(0.68rem, 1vw, 0.78rem);
-    font-weight: 650;
-    line-height: 1.1;
+    color: var(--zoro-text);
+    font-size: clamp(0.68rem, 0.84vw, 0.8rem);
+    font-weight: 750;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
     text-overflow: ellipsis;
+    text-transform: uppercase;
     white-space: nowrap;
   }
 
-  #{{ timer_id }} .zoro-timer__clock { display: flex; flex-shrink: 0; align-items: flex-start; gap: 2px; }
+  #{{ timer_id }} .zoro-timer__promo::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 9px;
+    background: var(--zoro-accent);
+    border-radius: 999px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--zoro-accent), transparent 84%);
+    vertical-align: 1px;
+  }
+
+  #{{ timer_id }} .zoro-timer__clock {
+    display: flex;
+    flex-shrink: 0;
+    align-items: stretch;
+    gap: 5px;
+    padding: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--zoro-line);
+    border-radius: 999px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
   #{{ timer_id }} .zoro-timer__unit { display: grid; justify-items: center; gap: 2px; }
   #{{ timer_id }} .zoro-timer__unit small {
-    color: var(--zoro-text);
-    font-size: 0.48rem;
+    color: var(--zoro-muted);
+    font-size: 0.5rem;
     font-weight: 600;
     line-height: 1;
-    opacity: 0.75;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   #{{ timer_id }} .zoro-timer__digit {
     display: grid;
-    min-width: 28px;
-    min-height: 24px;
+    min-width: 34px;
+    min-height: 30px;
     place-content: center;
-    padding: 2px 4px;
-    color: #ffffff;
+    padding: 4px 8px;
+    color: var(--zoro-bg);
     background: var(--zoro-accent);
-    border: 1px solid rgba(0, 0, 0, 0.16);
-    border-radius: 4px;
-    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.16);
+    border: 1px solid color-mix(in srgb, var(--zoro-accent), #000000 10%);
+    border-radius: 999px;
+    box-shadow:
+      inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+      0 6px 18px rgba(0, 0, 0, 0.18);
   }
 
   #{{ timer_id }} .zoro-timer__digit strong {
-    font-size: clamp(0.72rem, 1.2vw, 0.82rem);
+    font-size: clamp(0.74rem, 1vw, 0.88rem);
+    font-weight: 800;
     font-variant-numeric: tabular-nums;
-    line-height: 1;
+    letter-spacing: 0.04em;
+    line-height: 0.95;
   }
 
-  #{{ timer_id }} .zoro-timer__separator { padding-top: 7px; font-size: 0.7rem; font-weight: 700; }
+  #{{ timer_id }} .zoro-timer__separator {
+    align-self: center;
+    color: var(--zoro-muted);
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
   #{{ timer_id }} .zoro-timer__button {
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    min-height: 24px;
-    padding: 2px 8px;
-    color: #ffffff;
+    min-height: 34px;
+    padding: 6px 14px;
+    color: var(--zoro-bg);
     background: var(--zoro-accent);
-    border: 1px solid rgba(0, 0, 0, 0.16);
-    border-radius: 4px;
-    font-size: 0.66rem;
-    font-weight: 650;
+    border: 1px solid color-mix(in srgb, var(--zoro-accent), #000000 10%);
+    border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
     text-decoration: none;
+    text-transform: uppercase;
     white-space: nowrap;
+    transition: transform 160ms ease, filter 160ms ease;
   }
 
-  #{{ timer_id }} .zoro-timer__button:hover { filter: brightness(0.92); }
+  #{{ timer_id }} .zoro-timer__button:hover { filter: brightness(0.92); transform: translateY(-1px); }
   #{{ timer_id }} .zoro-timer__button[aria-disabled='true'] { opacity: 0.5; pointer-events: none; }
   #{{ timer_id }} .zoro-timer__close {
     display: grid;
@@ -157,7 +204,7 @@
     color: var(--zoro-text);
     background: transparent;
     border: 0;
-    border-radius: 4px;
+    border-radius: 999px;
     font: inherit;
     font-size: 1rem;
     cursor: pointer;
@@ -167,15 +214,17 @@
   #{{ timer_id }} .zoro-timer__close:hover { background: rgba(0, 0, 0, 0.08); opacity: 1; }
   #{{ timer_id }}.zoro-timer--minimal { box-shadow: none; }
   #{{ timer_id }}.zoro-timer--minimal .zoro-timer__digit {
-    min-width: 24px;
+    min-width: 30px;
     color: var(--zoro-accent);
     background: transparent;
-    border-color: transparent;
+    border-color: var(--zoro-line);
     box-shadow: none;
   }
 
   #{{ timer_id }}.zoro-timer--urgent {
-    background: linear-gradient(90deg, var(--zoro-bg), color-mix(in srgb, var(--zoro-bg), #ffffff 14%), var(--zoro-bg));
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.1), transparent 18%, rgba(255, 255, 255, 0.08), transparent 82%, rgba(255, 255, 255, 0.1)),
+      var(--zoro-bg);
     background-size: 200% 100%;
     animation: zoroUrgencyShift 2.4s ease-in-out infinite;
   }
@@ -186,13 +235,15 @@
   }
 
   @media screen and (max-width: 749px) {
-    #{{ timer_id }} { padding: 3px 6px; }
-    #{{ timer_id }} .zoro-timer__layout { gap: 4px; }
-    #{{ timer_id }} .zoro-timer__promo { flex: 1 1 auto; font-size: clamp(0.58rem, 2.4vw, 0.68rem); }
-    #{{ timer_id }} .zoro-timer__digit { min-width: 25px; min-height: 22px; padding: 1px 3px; }
+    #{{ timer_id }} { padding: 7px 8px; }
+    #{{ timer_id }} .zoro-timer__layout { gap: 7px; }
+    #{{ timer_id }} .zoro-timer__promo { flex: 1 1 auto; font-size: clamp(0.58rem, 2.3vw, 0.68rem); letter-spacing: 0.08em; }
+    #{{ timer_id }} .zoro-timer__promo::before { width: 5px; height: 5px; margin-right: 6px; }
+    #{{ timer_id }} .zoro-timer__clock { gap: 3px; padding: 2px; }
+    #{{ timer_id }} .zoro-timer__digit { min-width: 28px; min-height: 26px; padding: 3px 5px; }
     #{{ timer_id }} .zoro-timer__digit strong { font-size: 0.68rem; }
-    #{{ timer_id }} .zoro-timer__separator { padding-top: 6px; font-size: 0.62rem; }
-    #{{ timer_id }} .zoro-timer__button { min-height: 22px; padding: 2px 5px; font-size: 0.58rem; }
+    #{{ timer_id }} .zoro-timer__separator { font-size: 0.62rem; }
+    #{{ timer_id }} .zoro-timer__button { min-height: 28px; padding: 4px 8px; font-size: 0.56rem; letter-spacing: 0.06em; }
     #{{ timer_id }} .zoro-timer__close { flex-basis: 22px; width: 22px; height: 22px; }
   }
 
