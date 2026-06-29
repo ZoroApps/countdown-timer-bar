@@ -3,6 +3,21 @@
   assign position_class = 'zoro-timer--' | append: block.settings.positioning
   assign preset_class = 'zoro-timer--' | append: block.settings.design_preset
   assign product_collection_handles = product.collections | map: 'handle'
+  assign timer_background = block.settings.background_color
+  assign timer_text = block.settings.font_color
+  assign timer_accent = block.settings.digit_accent
+
+  if timer_background == '#FFF3CD' or timer_background == '#fff3cd'
+    assign timer_background = '#050505'
+  endif
+
+  if timer_text == '#202223'
+    assign timer_text = '#FFFFFF'
+  endif
+
+  if timer_accent == '#D72C0D' or timer_accent == '#d72c0d'
+    assign timer_accent = '#FFFFFF'
+  endif
 %}
 
 <div
@@ -53,9 +68,9 @@
 
 <style>
   #{{ timer_id }} {
-    --zoro-bg: {{ block.settings.background_color }};
-    --zoro-text: {{ block.settings.font_color }};
-    --zoro-accent: {{ block.settings.digit_accent }};
+    --zoro-bg: {{ timer_background }};
+    --zoro-text: {{ timer_text }};
+    --zoro-accent: {{ timer_accent }};
     --zoro-muted: color-mix(in srgb, var(--zoro-text), transparent 28%);
     --zoro-line: color-mix(in srgb, var(--zoro-text), transparent 84%);
     --zoro-raised: color-mix(in srgb, var(--zoro-bg), var(--zoro-text) 7%);
