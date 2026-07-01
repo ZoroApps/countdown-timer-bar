@@ -2,15 +2,14 @@
 
 client_id = "65d429496ba14fc46cf5dec321399ec3"
 name = "Zoro Countdown Timer Bar"
-application_url = "https://shopify.dev/apps/default-app-home"
+application_url = "https://2410studio.com/apps"
 embedded = true
-
-[build]
-include_config_on_deploy = true
-automatically_update_urls_on_dev = true
 
 [webhooks]
 api_version = "2026-07"
+
+[build]
+automatically_update_urls_on_dev = true
 
 [access.admin]
 direct_api_mode = "online"
@@ -20,4 +19,9 @@ embedded_app_direct_api_access = true
 scopes = ""
 
 [auth]
-redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
+redirect_urls = [ "https://2410studio.com/apps" ]
+
+[webhooks.privacy_compliance]
+customer_deletion_url = "https://countdoownn.netlify.app/.netlify/functions/shopify-privacy"
+customer_data_request_url = "https://countdoownn.netlify.app/.netlify/functions/shopify-privacy"
+shop_deletion_url = "https://countdoownn.netlify.app/.netlify/functions/shopify-privacy"
